@@ -34,20 +34,6 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, 
 model = LogisticRegression()
 model.fit(X_train, y_train)
 
-from sklearn.inspection import permutation_importance
-import matplotlib.pyplot as plt
-
-# Calculate feature importance
-result = permutation_importance(model, X_test, y_test, n_repeats=10, random_state=42)
-
-# Save feature importance values
-importances = result.importances_mean
-feature_names = X.columns
-
-importance_data = sorted(zip(feature_names, importances), key=lambda x: x[1], reverse=True)
-
-# Save for use in app
-joblib.dump(importance_data, "feature_importance.pkl")
 
 
 # Evaluate model
