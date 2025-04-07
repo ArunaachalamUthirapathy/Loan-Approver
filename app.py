@@ -4,6 +4,8 @@ import numpy as np
 
 # Load model
 model = joblib.load("model.pkl")
+importance_data = joblib.load("feature_importance.pkl")
+
 
 # Set page config
 st.set_page_config(page_title="Loan Approval Predictor", layout="centered")
@@ -53,6 +55,13 @@ if submitted:
 
     # Predict
     prediction = model.predict(features)[0]
+    
+st.markdown("---")
+st.subheader("🔍 Feature Influence (Top 5)")
+
+for name, score in importance_data[:5]:
+    st.write(f"• **{name}** – importance: `{score:.4f}`")
+
 
     # Show result
     if prediction == 1:
