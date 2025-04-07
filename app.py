@@ -1,79 +1,61 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 import joblib
+import numpy as np
 
-# Load model and scaler
+# Load model
 model = joblib.load("model.pkl")
-scaler = joblib.load("scaler.pkl")
 
+# Set page config
 st.set_page_config(page_title="Loan Approval Predictor", layout="centered")
-st.title("🏦 Loan Approval Prediction App")
-st.write("Enter your loan application details below:")
 
-# User Inputs
-col1, col2 = st.columns(2)
-with col1:
-    Gender = st.selectbox("Gender", ["Male", "Female"])
-    Married = st.selectbox("Married", ["Yes", "No"])
-    Dependents = st.selectbox("Dependents", ["0", "1", "2", "3+"])
-    Education = st.selectbox("Education", ["Graduate", "Not Graduate"])
-    Self_Employed = st.selectbox("Self Employed", ["Yes", "No"])
+# Header
+st.markdown("""
+    <h1 style='text-align: center; color: #4CAF50;'>🏦 Loan Approval Prediction App</h1>
+    <p style='text-align: center;'>Enter applicant details to check loan eligibility</p>
+    <hr>
+""", unsafe_allow_html=True)
 
-with col2:
-    ApplicantIncome = st.number_input("Applicant Income", min_value=0)
-    CoapplicantIncome = st.number_input("Coapplicant Income", min_value=0)
-    LoanAmount = st.number_input("Loan Amount (in thousands)", min_value=0)
-    Loan_Amount_Term = st.selectbox("Loan Term (months)", [360, 120, 180, 240, 300])
-    Credit_History = st.selectbox("Credit History", [1.0, 0.0])
-    Property_Area = st.selectbox("Property Area", ["Urban", "Semiurban", "Rural"])
+# Form
+with st.form("loan_form"):
+    col1, col2 = st.columns(2)
 
-# Convert to numerical
-def encode_input():
-    gender = 1 if Gender == "Male" else 0
-    married = 1 if Married == "Yes" else 0
-    dependents = {"0": 0, "1": 1, "2": 2, "3+": 3}[Dependents]
-    education = 1 if Education == "Graduate" else 0
-    self_employed = 1 if Self_Employed == "Yes" else 0
-    property_area = {"Urban": 2, "Semiurban": 1, "Rural": 0}[Property_Area]
+    with col1:
+        gender = st.selectbox("Gender", ["Male", "Female"])
+        married = st.selectbox("Married", ["No", "Yes"])
+        dependents = st.selectbox("Dependents", ["0", "1", "2", "3+"])
+        education = st.selectbox("Education", ["Graduate", "Not Graduate"])
+        self_employed = st.selectbox("Self Employed", ["No", "Yes"])
 
-    return [
-        gender, married, dependents, education, self_employed,
-        ApplicantIncome, CoapplicantIncome, LoanAmount,
-        Loan_Amount_Term, Credit_History, property_area
-    ]
+    with col2:
+        applicant_income = st.number_input("Applicant Income", min_value=0)
+        coapplicant_income = st.number_input("Coapplicant Income", min_value=0)
+        loan_amount = st.number_input("Loan Amount (in Thousands)", min_value=0)
+        loan_amount_term = st.number_input("Loan Term (in days)", min_value=0)
+        credit_history = st.selectbox("Credit History", ["No", "Yes"])
+        property_area = st.selectbox("Property Area", ["Urban", "Rural", "Semiurban"])
 
-if st.button("Predict Loan Approval"):
-    input_features = encode_input()
-    input_data = np.array([input_features])
-    input_scaled = scaler.transform(input_data)
-    prediction = model.predict(input_scaled)[0]
-    prediction_text = "✅ Loan is likely to be Approved!" if prediction == 1 else "❌ Loan is likely to be Rejected."
+    submitted = st.form_submit_button("Predict")
+
+if submitted:
+    # Encode inputs
+    gender = 1 if gender == "Male" else 0
+    married = 1 if married == "Yes" else 0
+    education = 1 if education == "Graduate" else 0
+    self_employed = 1 if self_employed == "Yes" else 0
+    credit_history = 1 if credit_history == "Yes" else 0
+    dependents = 3 if dependents == "3+" else int(dependents)
+    property_dict = {"Urban": 2, "Semiurban": 1, "Rural": 0}
+    property_area = property_dict[property_area]
+
+    features = np.array([[gender, married, dependents, education, self_employed,
+                          applicant_income, coapplicant_income, loan_amount,
+                          loan_amount_term, credit_history, property_area]])
+
+    # Predict
+    prediction = model.predict(features)[0]
 
     # Show result
-    st.markdown("### Result:")
     if prediction == 1:
-        st.success(prediction_text)
+        st.success("✅ Loan is likely to be Approved!")
     else:
-        st.error(prediction_text)
-
-    # Prepare data for download
-    result_dict = {
-        "Gender": Gender,
-        "Married": Married,
-        "Dependents": Dependents,
-        "Education": Education,
-        "Self_Employed": Self_Employed,
-        "ApplicantIncome": ApplicantIncome,
-        "CoapplicantIncome": CoapplicantIncome,
-        "LoanAmount": LoanAmount,
-        "Loan_Amount_Term": Loan_Amount_Term,
-        "Credit_History": Credit_History,
-        "Property_Area": Property_Area,
-        "Prediction": "Approved" if prediction == 1 else "Rejected"
-    }
-    result_df = pd.DataFrame([result_dict])
-
-    # Download button
-    csv = result_df.to_csv(index=False).encode("utf-8")
-    st.download_button("📥 Download Report (CSV)", csv, file_name="loan_prediction_report.csv", mime="text/csv")
+        st.error("❌ Loan is likely to be Rejected.")
