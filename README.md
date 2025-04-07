@@ -1,32 +1,24 @@
 # 🏦 Loan Approval Prediction App
 
-A professional-level Machine Learning app built with **Streamlit** that predicts whether a loan will be approved or not — based on user inputs.
-
----
+A Streamlit-based ML web app that predicts whether a loan will be approved based on applicant data. Built using Python, scikit-learn, and Streamlit. Deployed on Streamlit Cloud.
 
 ## 🚀 Features
+- Easy-to-use form for loan details
+- Real-time ML prediction
+- Feature importance explanation
+- Clean, responsive UI
+- Export predictions (optional)
 
-- Predicts loan approval in real-time
-- Clean UI with form inputs
-- Displays result and allows CSV report download
-- Built with trained ML model (Random Forest)
-- Easy to deploy on Streamlit Cloud
+## 📊 Tech Stack
+- Python
+- Pandas, NumPy
+- scikit-learn
+- Streamlit
 
----
-
-## 📦 Tech Stack
-
-- Python, Pandas, NumPy
-- Scikit-learn (ML)
-- Streamlit (Web UI)
-- Joblib (Model serialization)
-
----
-
-## 🧪 How to Run Locally
+## 🛠️ How to Run Locally
 
 ```bash
-git clone https://github.com/your-username/loan-approval-app.git
-cd loan-approval-app
+git clone https://github.com/yourusername/Loan-Approver.git
+cd Loan-Approver
 pip install -r requirements.txt
 streamlit run app.py
