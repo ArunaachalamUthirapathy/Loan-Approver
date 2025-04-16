@@ -8,10 +8,11 @@ model = joblib.load("model.pkl")
 scaler = joblib.load("scaler.pkl")
 
 st.set_page_config(page_title="Loan Approval Predictor", layout="centered")
+
 # Header
 st.markdown("""
     <h1 style='text-align: center; color: #4CAF50;'>🏦 Loan Approval Prediction App</h1>
-    <p style='text-align: center;'>Enter applicant details to check loan eligibility</p>
+    <p style='text-align: center;'>Enter details to check loan eligibility</p>
     <hr>
 """, unsafe_allow_html=True)
 
@@ -51,17 +52,35 @@ if submitted:
                           ApplicantIncome, CoapplicantIncome, LoanAmount,
                           Loan_Amount_Term, credit_history, property_area]])
 
-    # Scale features using the loaded scaler (optional if scaling was applied to the training data)
+    # Scale features using the loaded scaler
     features_scaled = scaler.transform(features)
 
     # Predict
     prediction = model.predict(features_scaled)[0]
 
-    # Show result
+    # Display results
     if prediction == 1:
         st.success("✅ Loan is likely to be Approved!")
+        st.markdown("### 😍 Congrats your loan is approved by team 💰?")
+        st.write(f"""
+            Based on the provided information, your loan is likely to be approved because:
+            - **Credit History**: {Credit_History}, a good repayment history.
+            - **Education**: {Education} (Graduate), which is favorable for approval.
+            - **Property Area**: {Property_Area}, an urban area generally increases chances of approval.
+            - **Applicant Income**: {ApplicantIncome}, shows financial stability.
+            - **Coapplicant Income**: {CoapplicantIncome}, further supports your financial background.
+        """)
     else:
         st.error("❌ Loan is likely to be Rejected.")
+        st.markdown("### 😓Why is the loan rejected?")
+        st.write(f"""
+            Based on the provided information, your loan is likely to be rejected due to one or more of the following reasons:
+            - **Credit History**: {Credit_History}, which is unfavorable.
+            - **Loan Amount**: {LoanAmount}, might be too high compared to your income.
+            - **Applicant Income**: {ApplicantIncome}, might not meet the required threshold for approval.
+            - **Dependents**: {Dependents}, additional financial obligations can affect approval chances.
+            - **Self-Employed**: {Self_Employed}, which could be a risk factor in some cases.
+        """)
 
     # Prepare data for download
     result_dict = {
