@@ -1,8 +1,6 @@
 # 🏦 Loan Approval Prediction App
 
 A Streamlit-based ML web app that predicts whether a loan will be approved based on applicant data. Built using Python, scikit-learn, and Streamlit. Deployed on Streamlit Cloud.
-# 🏦 Loan Approval Predictor App
-> Predict loan approval status using applicant details and machine learning with a beautiful Streamlit UI 🎯
 
 ---
 
